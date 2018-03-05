@@ -1,0 +1,203 @@
+{{#if isMobile}}
+<section style="padding-bottom:0.5rem; padding-top: 0.5rem;">
+<!--    <legend>Klikni dugme SCAN na skeneru<legend> -->
+    
+    <input value="{{scancode}}" type="text" id ="scancode" placeholder="Fokusiraj ovo polje i klikni dugme SCAN na skeneru" >
+<!--                <button primary m-full id="scancodeBtn" on-click="@this.fire('scancodeBtn')" >OKx</button> -->
+</section>
+<section style="flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto">
+    <table>
+    {{#scanhistoryarr:i}}
+        <tr>
+            <td>{{scanhistoryarr[i][0]}}</td>
+            <td style="font-size:1.2rem">{{scanhistoryarr[i][1]}}</td>
+            <td style="text-align: right">{{scanhistoryarr[i][2]}}</td>
+        </tr>
+    {{/scanhistoryarr}}
+    </table>
+</section>
+<section style="padding-bottom:0.5rem; padding-top:0.5rem">
+    <button m-full on-click="@this.fire('clearscan')"  >Obriši podatke sa skenera</button>
+    <button primary m-full on-click="@this.fire('save2server')" >Save to server</button>
+</section>
+{{/if}}
+
+{{#if !isMobile}}
+<section>
+    <legend>Upload šifarnika</legend>
+    <input name="myFile" id="myFile" type="file" on-change = "@this.prepareUpload()">
+</section>        
+<section style="flex:1; padding-bottom:0.5rem; padding-top:0.5rem; display: flex; flex-flow: column; overflow-x: auto;">
+
+    <div class="cardcont" style="width:calc(36rem * {{Object.keys(cards).length}} )">
+        {{#cards:o}}
+        <div class="cardparent">
+            <card>
+                <h5 style="margin:0;">{{.title}}.txt</h5>
+                <hr>
+<pre>{{#.arr:i}}{{arr[i][0]}};{{arr[i][1]}};{{arr[i][2]}}
+{{/.arr}}</pre>
+            </card>
+        </div>
+        {{/cards}}
+    </div>
+
+    <!--
+    <legend>Očitani podaci sa skenera</legend>
+        <textarea style="flex: 1; overflow: auto; height: 100%;" value="{{scanhistoryfromserver}}" ></textarea>
+    -->
+</section>
+<section style="padding-bottom:0.5rem; padding-top:0.5rem">
+        <button on-click="@this.fire('save2disk')">Save</button>
+        <input type="text" value="{{filename}}" placeholder="filename.txt" style="width:20em">
+        <button on-click="@this.fire('clearscan')" style="float:right" >Obriši podatke sa skenera</button>
+    </section>
+
+{{/if}}
+<script>
+console.log('root.html');
+
+  component.exports = {
+    onrender: function () {
+      var self = this;
+      //window.scanhistorykv = {}; 
+
+      //var sifarnik = {};
+      //var scanhistory = [];      
+
+      this.observe('scancode', function(n,o,k,i){
+          setTimeout(function(){ self.set('scancode',null); }, 1);        
+          if (!n) return;
+          scancodeBtn(n);
+      })
+
+      var sc = document.getElementById('scancode');
+        if (sc)
+        sc.addEventListener("click", function(e){
+          e.preventDefault();
+          //sc.blur();
+          //setTimeout(function(){sc.focus()} ,2000)
+          //console.log('click')
+          return false;
+        });
+
+      this.on('save2disk', function(){
+  //        var blob = new Blob([scanhistoryfromserver], {type: "text/plain;charset=cp1252"});
+          var cards = self.get('cards');
+          var cardKeys = Object.keys(cards);
+          for(var i=0; i<cardKeys.length; i++){
+              var o = cards[ cardKeys[i] ];
+              var out = o.txt.join('\r\n');
+              var title = o.title;
+              var blob = new Blob([out], {type: "text/plain;"}); //TODO: nije vise string
+              FileSaver.saveAs(blob, title || 'sken.txt' );        
+          }
+      })
+
+      this.on('clearscan', function(){
+          socket.emit('clearscan');
+          self.set('scanhistoryfromserver', []);       
+          self.set('scanhistoryarr', []);      
+          scanhistorykv = {}; 
+      })
+
+      this.on('save2server', function(){
+          socket.emit('save2server');     
+      })
+      
+      /*    ractive.on('scancodeBtn', function(e){
+          var scancode = ractive.get('scancode');
+          //scancodeBtn(scancode);
+      }) */
+      this.observe('scanhistoryfromserver', function(){
+          if (isMobile.any) return;
+          console.log('fixcards();')
+          fixcards();
+      })
+
+      
+      function fixcards(){
+          var cards = {};//ractive.get('cards') || {};
+          var scanhistoryfromserver = self.get('scanhistoryfromserver');
+          for(var i=0; i<scanhistoryfromserver.length; i++){
+              var k = scanhistoryfromserver[i][3];
+              var k4 = (scanhistoryfromserver[i][1] == k) ? 'VP' :String(k).substr(0, 4);
+              if (!cards[k4]) cards[k4] = { title:k4, arr:[], txt:[] };
+  //            cards[k4]['arr'].splice(0,0,scanhistoryfromserver[i])
+              cards[k4]['arr'].push(scanhistoryfromserver[i]);
+              cards[k4]['txt'].push(scanhistoryfromserver[i][0] + ';' + scanhistoryfromserver[i][1] + ';' + scanhistoryfromserver[i][2] );
+          }
+          self.set('cards', cards);
+      }
+      //var scanhistorykv = {};
+
+      function scancodeBtn(scancode){
+          //console.log('scancodeBtn', scancode);
+          if (scancode && sifarnik[scancode]){
+              if (scanhistorykv[scancode]){
+                  ion.sound.stop("vecpostoji");ion.sound.play("vecpostoji");
+                  alertify.notify('Šifra '+scancode+' je vec očitana', 'warning', 3);
+                  return
+              }
+              scanhistorykv[scancode] = true;
+              //scanhistoryfromserverarr
+              var scanhistoryarr = self.get('scanhistoryarr');
+              scanhistoryarr.splice(0, 0, sifarnik[scancode]);
+              self.set('scanhistoryarr', scanhistoryarr)
+
+              //ractive.splice('scanhistoryarr',0,0, sifarnik[scancode]) // riknjava raktiv na splajs!
+  //            ractive.push('scanhistoryarr', sifarnik[scancode])
+              //var str = sifarnik[scancode].join(';')
+              socket.emit('addscan', sifarnik[scancode]);
+
+
+          } else {
+              ion.sound.stop("no");ion.sound.play("no");
+              alertify.notify('Šifra '+scancode+' nije nađena', 'error', 3);
+          } 
+          //ractive.set('scancode','')
+      }
+
+
+      this.prepareUpload = function (){
+          var input = document.getElementById('myFile')
+          console.log('myFile',input.files);
+          var curFiles = input.files[0];
+
+          // Parse local CSV file
+          Papa.parse(curFiles, {
+            // encoding:'cp1252',
+              complete: function(results) {
+                  console.log("Finished:", results.data);
+                  
+                  var arrdata = results.data;
+                  var j={};
+                  for (var i=0;i<arrdata.length;i++) {
+                      //console.log(i, arrdata[i][1]);
+                      
+                      var kk = arrdata[i][1];
+                      if (!kk) continue;
+                      var k = kk.split('=')[0];
+                      j[k] = arrdata[i];
+                      j[k].push(k);// 4. je stripovana sifra
+                  }
+                  console.log(j);
+                  // send to server 
+                  socket.emit('sifarnik', j, function(){ 
+                      alertify.notify('Sifarnik sacuvan', 'success', 3);
+                  });
+                  
+                  //var txt = Papa.unparse(results.data,{encoding:'utf-8'});
+                  //console.log(txt)
+              }
+          });        
+
+    }
+
+      
+    },
+    //data: {
+    //  title: 'Hello World!'
+    //}
+  };
+  </script>
