@@ -3,7 +3,10 @@
 <!--    <legend>Klikni dugme SCAN na skeneru<legend> -->
     
     <input value="{{scancode}}" type="text" id ="scancode" placeholder="Fokusiraj ovo polje i klikni dugme SCAN na skeneru" >
-<!--                <button primary m-full id="scancodeBtn" on-click="@this.fire('scancodeBtn')" >OKx</button> -->
+    {{#if scanhistoryarr.length>0}}
+    <tag style="position: fixed; top: 4px;right: 0;font-size: 1.4rem;">{{scanhistoryarr.length}}</tag>
+    {{/if}}
+    <!--                <button primary m-full id="scancodeBtn" on-click="@this.fire('scancodeBtn')" >OKx</button> -->
 </section>
 <section style="flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto">
     <table>
@@ -17,7 +20,8 @@
     </table>
 </section>
 <section style="padding-bottom:0.5rem; padding-top:0.5rem">
-    <button m-full on-click="@this.fire('clearscan')"  >Obriši podatke sa skenera</button>
+<!--    <button m-full on-click="@this.fire('clearscan')"  >Obriši podatke sa skenera</button> -->
+    <button m-full on-click="@this.set('showDeleteDialog',true)"  >Obriši podatke sa skenera</button>
     <button primary m-full on-click="@this.fire('save2server')" >Save to server</button>
 </section>
 {{/if}}
@@ -50,9 +54,14 @@
 <section style="padding-bottom:0.5rem; padding-top:0.5rem">
         <button on-click="@this.fire('save2disk')">Save</button>
         <input type="text" value="{{filename}}" placeholder="filename.txt" style="width:20em">
-        <button on-click="@this.fire('clearscan')" style="float:right" >Obriši podatke sa skenera</button>
+<!--        <button on-click="@this.fire('clearscan')" style="float:right" >Obriši podatke sa skenera</button> -->
+        <button on-click="@this.set('showDeleteDialog',true)" style="float:right" >Obriši podatke sa skenera</button>
     </section>
 
+{{/if}}
+
+{{#if showDeleteDialog}}
+<dialog showDeleteDialog={{showDeleteDialog}}></dialog>
 {{/if}}
 <script>
 console.log('root.html');
@@ -81,6 +90,10 @@ console.log('root.html');
           return false;
         });
 
+        this.on('*.xxx', function(){
+            console.log('xxx')
+        })
+
       this.on('save2disk', function(){
   //        var blob = new Blob([scanhistoryfromserver], {type: "text/plain;charset=cp1252"});
           var cards = self.get('cards');
@@ -94,7 +107,9 @@ console.log('root.html');
           }
       })
 
-      this.on('clearscan', function(){
+      this.on('*.clearscan', function(){
+          self.set('showDeleteDialog',false)
+          console.log('clearscan')
           socket.emit('clearscan');
           self.set('scanhistoryfromserver', []);       
           self.set('scanhistoryarr', []);      

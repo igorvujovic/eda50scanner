@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -17258,15 +17258,43 @@
 	return Ractive;
 
 }));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Ractive  = __webpack_require__(0);
-window.Papa = __webpack_require__(3);
-window.FileSaver = __webpack_require__(4);
+window.Papa = __webpack_require__(4);
+window.FileSaver = __webpack_require__(5);
 //import Ractive from 'ractive';
 
 //Ractive.defaults.isolated=true;
@@ -17281,8 +17309,8 @@ Ractive.prototype.unset = function(keypath){
 }
 
 console.log('ke')
-window.alertify = __webpack_require__(7)
-__webpack_require__(8)
+window.alertify = __webpack_require__(8)
+__webpack_require__(9)
 alertify.defaults = {
     notifier:{
         // auto-dismiss wait time (in seconds)  
@@ -17303,7 +17331,8 @@ ion.sound({
     preload: true
 });
 
-Ractive.components.Root                    =  __webpack_require__(9);
+Ractive.components.Root                    =  __webpack_require__(10);
+Ractive.components.dialog                  =  __webpack_require__(11);
 
 var ractive = new Ractive.components.Root({
     el: 'body',
@@ -17317,9 +17346,11 @@ var ractive = new Ractive.components.Root({
             , filename:''
             , cards:{} // : { '0800':{title:"0800", arr:[...]} }
             , keyz:[]
+            , showDeleteDialog:false
         }
     }
 });
+window.ractive = ractive;
 
 if (document.getElementById("scancode"))  document.getElementById("scancode").autofocus = true; 
 /*
@@ -17350,7 +17381,14 @@ socket.on('scan', function (scan) {
 
 socket.on('addscan', function (addscan) {
     console.log('addscan', addscan);
-    ractive.splice('scanhistoryfromserver', 0,0,addscan);
+    var scancode = addscan[3];
+    if (scancode && sifarnik[scancode]){
+        if (scanhistorykv[scancode]){
+            return
+        }
+        scanhistorykv[scancode] = true;
+        ractive.splice('scanhistoryfromserver', 0, 0, addscan);
+    }
 });
 
 socket.on('save2server', function () {
@@ -17377,7 +17415,7 @@ document.addEventListener("paste", function(e){
 */
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17404,7 +17442,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -19007,7 +19045,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/* FileSaver.js
@@ -19193,7 +19231,7 @@ var saveAs = saveAs || (function(view) {
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports.saveAs = saveAs;
-} else if (("function" !== "undefined" && __webpack_require__(5) !== null) && (__webpack_require__(6) !== null)) {
+} else if (("function" !== "undefined" && __webpack_require__(6) !== null) && (__webpack_require__(7) !== null)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
     return saveAs;
   }).call(exports, __webpack_require__, exports, module),
@@ -19202,7 +19240,7 @@ if (typeof module !== "undefined" && module.exports) {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -19211,7 +19249,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -19220,7 +19258,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -22822,7 +22860,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 ﻿/**
@@ -23910,7 +23948,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var Ractive = __webpack_require__(0);
@@ -23942,6 +23980,10 @@ console.log('root.html');
           return false;
         });
 
+        this.on('*.xxx', function(){
+            console.log('xxx')
+        })
+
       this.on('save2disk', function(){
   //        var blob = new Blob([scanhistoryfromserver], {type: "text/plain;charset=cp1252"});
           var cards = self.get('cards');
@@ -23955,7 +23997,9 @@ console.log('root.html');
           }
       })
 
-      this.on('clearscan', function(){
+      this.on('*.clearscan', function(){
+          self.set('showDeleteDialog',false)
+          console.log('clearscan')
           socket.emit('clearscan');
           self.set('scanhistoryfromserver', []);       
           self.set('scanhistoryarr', []);      
@@ -24062,38 +24106,35 @@ console.log('root.html');
     //}
   };
   
-component.exports.template = {v:4,t:[{t:4,f:[{p:[2,1,17],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top: 0.5rem;",t:13}],f:[" ",{p:[5,5,145],t:7,e:"input",m:[{n:"value",f:[{t:2,r:"scancode",p:[5,19,159]}],t:13},{n:"type",f:"text",t:13},{n:"id",f:"scancode",t:13},{n:"placeholder",f:"Fokusiraj ovo polje i klikni dugme SCAN na skeneru",t:13}]}," "]}," ",{p:[8,1,393],t:7,e:"section",m:[{n:"style",f:"flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto",t:13}],f:[{p:[9,5,480],t:7,e:"table",f:[{t:4,f:[{p:[11,9,522],t:7,e:"tr",f:[{p:[12,13,539],t:7,e:"td",f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"0"}]},p:[12,17,543]}]}," ",{p:[13,13,585],t:7,e:"td",m:[{n:"style",f:"font-size:1.2rem",t:13}],f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"1"}]},p:[13,42,614]}]}," ",{p:[14,13,656],t:7,e:"td",m:[{n:"style",f:"text-align: right",t:13}],f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"2"}]},p:[14,43,686]}]}]}],i:"i",r:"scanhistoryarr",p:[10,5,492]}]}]}," ",{p:[19,1,778],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top:0.5rem",t:13}],f:[{p:[20,5,842],t:7,e:"button",m:[{n:"m-full",f:0,t:13},{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"clearscan\")]"}},t:70}],f:["Obriši podatke sa skenera"]}," ",{p:[21,5,933],t:7,e:"button",m:[{n:"primary",f:0,t:13},{n:"m-full",f:0,t:13},{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"save2server\")]"}},t:70}],f:["Save to server"]}]}],n:50,r:"isMobile",p:[1,1,0]},{t:4,f:[{p:[26,1,1056],t:7,e:"section",f:[{p:[27,5,1070],t:7,e:"legend",f:["Upload šifarnika"]}," ",{p:[28,5,1108],t:7,e:"input",m:[{n:"name",f:"myFile",t:13},{n:"id",f:"myFile",t:13},{n:"type",f:"file",t:13},{n:"change",f:{x:{r:["@this"],s:"[_0.prepareUpload()]"}},t:70}]}]}," ",{p:[30,1,1209],t:7,e:"section",m:[{n:"style",f:"flex:1; padding-bottom:0.5rem; padding-top:0.5rem; display: flex; flex-flow: column; overflow-x: auto;",t:13}],f:[{p:[32,5,1335],t:7,e:"div",m:[{n:"class",f:"cardcont",t:13},{n:"style",f:["width:calc(36rem * ",{t:2,x:{r:["cards"],s:"Object.keys(_0).length"},p:[32,53,1383]}," )"],t:13}],f:[{t:4,f:[{p:[34,9,1446],t:7,e:"div",m:[{n:"class",f:"cardparent",t:13}],f:[{p:[35,13,1483],t:7,e:"card",f:[{p:[36,17,1506],t:7,e:"h5",m:[{n:"style",f:"margin:0;",t:13}],f:[{t:2,r:".title",p:[36,39,1528]},".txt"]}," ",{p:[37,17,1564],t:7,e:"hr"}," ",{p:[38,1,1569],t:7,e:"pre",f:[{t:4,f:[{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"0"}]},p:[38,17,1585]},";",{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"1"}]},p:[38,31,1599]},";",{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"2"}]},p:[38,45,1613]},"\n"],i:"i",r:".arr",p:[38,6,1574]}]}]}]}],i:"o",r:"cards",p:[33,9,1425]}]}," "]}," ",{p:[50,1,1896],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top:0.5rem",t:13}],f:[{p:[51,9,1964],t:7,e:"button",m:[{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"save2disk\")]"}},t:70}],f:["Save"]}," ",{p:[52,9,2029],t:7,e:"input",m:[{n:"type",f:"text",t:13},{n:"value",f:[{t:2,r:"filename",p:[52,35,2055]}],t:13},{n:"placeholder",f:"filename.txt",t:13},{n:"style",f:"width:20em",t:13}]}," ",{p:[53,9,2124],t:7,e:"button",m:[{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"clearscan\")]"}},t:70},{n:"style",f:"float:right",t:13}],f:["Obriši podatke sa skenera"]}]}],n:50,x:{r:["isMobile"],s:"!_0"},p:[25,1,1038]}],e:{"0":function (){return(0);},"1":function (){return(1);},"2":function (){return(2);},"[_0.fire(\"clearscan\")]":function (_0){return([_0.fire("clearscan")]);},"[_0.fire(\"save2server\")]":function (_0){return([_0.fire("save2server")]);},"[_0.prepareUpload()]":function (_0){return([_0.prepareUpload()]);},"Object.keys(_0).length":function (_0){return(Object.keys(_0).length);},"[_0.fire(\"save2disk\")]":function (_0){return([_0.fire("save2disk")]);},"!_0":function (_0){return(!_0);}}};
+component.exports.template = {v:4,t:[{t:4,f:[{p:[2,1,17],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top: 0.5rem;",t:13}],f:[" ",{p:[5,5,145],t:7,e:"input",m:[{n:"value",f:[{t:2,r:"scancode",p:[5,19,159]}],t:13},{n:"type",f:"text",t:13},{n:"id",f:"scancode",t:13},{n:"placeholder",f:"Fokusiraj ovo polje i klikni dugme SCAN na skeneru",t:13}]}," ",{t:4,f:[{p:[7,5,307],t:7,e:"tag",m:[{n:"style",f:"position: fixed; top: 4px;right: 0;font-size: 1.4rem;",t:13}],f:[{t:2,r:"scanhistoryarr.length",p:[7,72,374]}]}],n:50,x:{r:["scanhistoryarr.length"],s:"_0>0"},p:[6,5,271]}," "]}," ",{p:[11,1,548],t:7,e:"section",m:[{n:"style",f:"flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto",t:13}],f:[{p:[12,5,635],t:7,e:"table",f:[{t:4,f:[{p:[14,9,677],t:7,e:"tr",f:[{p:[15,13,694],t:7,e:"td",f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"0"}]},p:[15,17,698]}]}," ",{p:[16,13,740],t:7,e:"td",m:[{n:"style",f:"font-size:1.2rem",t:13}],f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"1"}]},p:[16,42,769]}]}," ",{p:[17,13,811],t:7,e:"td",m:[{n:"style",f:"text-align: right",t:13}],f:[{t:2,rx:{r:"scanhistoryarr",m:[{t:30,n:"i"},{r:[],s:"2"}]},p:[17,43,841]}]}]}],i:"i",r:"scanhistoryarr",p:[13,5,647]}]}]}," ",{p:[22,1,933],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top:0.5rem",t:13}],f:[" ",{p:[24,5,1096],t:7,e:"button",m:[{n:"m-full",f:0,t:13},{n:"click",f:{x:{r:["@this"],s:"[_0.set(\"showDeleteDialog\",true)]"}},t:70}],f:["Obriši podatke sa skenera"]}," ",{p:[25,5,1198],t:7,e:"button",m:[{n:"primary",f:0,t:13},{n:"m-full",f:0,t:13},{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"save2server\")]"}},t:70}],f:["Save to server"]}]}],n:50,r:"isMobile",p:[1,1,0]},{t:4,f:[{p:[30,1,1321],t:7,e:"section",f:[{p:[31,5,1335],t:7,e:"legend",f:["Upload šifarnika"]}," ",{p:[32,5,1373],t:7,e:"input",m:[{n:"name",f:"myFile",t:13},{n:"id",f:"myFile",t:13},{n:"type",f:"file",t:13},{n:"change",f:{x:{r:["@this"],s:"[_0.prepareUpload()]"}},t:70}]}]}," ",{p:[34,1,1474],t:7,e:"section",m:[{n:"style",f:"flex:1; padding-bottom:0.5rem; padding-top:0.5rem; display: flex; flex-flow: column; overflow-x: auto;",t:13}],f:[{p:[36,5,1600],t:7,e:"div",m:[{n:"class",f:"cardcont",t:13},{n:"style",f:["width:calc(36rem * ",{t:2,x:{r:["cards"],s:"Object.keys(_0).length"},p:[36,53,1648]}," )"],t:13}],f:[{t:4,f:[{p:[38,9,1711],t:7,e:"div",m:[{n:"class",f:"cardparent",t:13}],f:[{p:[39,13,1748],t:7,e:"card",f:[{p:[40,17,1771],t:7,e:"h5",m:[{n:"style",f:"margin:0;",t:13}],f:[{t:2,r:".title",p:[40,39,1793]},".txt"]}," ",{p:[41,17,1829],t:7,e:"hr"}," ",{p:[42,1,1834],t:7,e:"pre",f:[{t:4,f:[{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"0"}]},p:[42,17,1850]},";",{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"1"}]},p:[42,31,1864]},";",{t:2,rx:{r:"arr",m:[{t:30,n:"i"},{r:[],s:"2"}]},p:[42,45,1878]},"\n"],i:"i",r:".arr",p:[42,6,1839]}]}]}]}],i:"o",r:"cards",p:[37,9,1690]}]}," "]}," ",{p:[54,1,2161],t:7,e:"section",m:[{n:"style",f:"padding-bottom:0.5rem; padding-top:0.5rem",t:13}],f:[{p:[55,9,2229],t:7,e:"button",m:[{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"save2disk\")]"}},t:70}],f:["Save"]}," ",{p:[56,9,2294],t:7,e:"input",m:[{n:"type",f:"text",t:13},{n:"value",f:[{t:2,r:"filename",p:[56,35,2320]}],t:13},{n:"placeholder",f:"filename.txt",t:13},{n:"style",f:"width:20em",t:13}]}," ",{p:[58,9,2504],t:7,e:"button",m:[{n:"click",f:{x:{r:["@this"],s:"[_0.set(\"showDeleteDialog\",true)]"}},t:70},{n:"style",f:"float:right",t:13}],f:["Obriši podatke sa skenera"]}]}],n:50,x:{r:["isMobile"],s:"!_0"},p:[29,1,1303]},{t:4,f:[{p:[64,1,2664],t:7,e:"dialog",m:[{n:"showDeleteDialog",f:[{t:2,r:"showDeleteDialog",p:[64,26,2689]}],t:13}]}],n:50,r:"showDeleteDialog",p:[63,1,2639]}],e:{"0":function (){return(0);},"1":function (){return(1);},"2":function (){return(2);},"_0>0":function (_0){return(_0>0);},"[_0.set(\"showDeleteDialog\",true)]":function (_0){return([_0.set("showDeleteDialog",true)]);},"[_0.fire(\"save2server\")]":function (_0){return([_0.fire("save2server")]);},"[_0.prepareUpload()]":function (_0){return([_0.prepareUpload()]);},"Object.keys(_0).length":function (_0){return(Object.keys(_0).length);},"[_0.fire(\"save2disk\")]":function (_0){return([_0.fire("save2disk")]);},"!_0":function (_0){return(!_0);}}};
 module.exports = Ractive.extend(component.exports);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)(module)))
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports) {
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
+/* WEBPACK VAR INJECTION */(function(module) {var Ractive = __webpack_require__(0);
+var component = module;
 
+    component.exports = {
+        onrender: function () {
+            var self = this;
+        },
+        data:function(){
+            return {
+                showDeleteDialog:false
+            }
+        }
+    }        
+
+
+component.exports.template = {v:4,t:[{p:[1,1,0],t:7,e:"div",m:[{n:"class",f:"bg",t:13}],f:[]}," ",{p:[3,1,24],t:7,e:"div",m:[{n:"class",f:"dialog",t:13}],f:[{p:[4,5,49],t:7,e:"card",f:[{p:[5,9,64],t:7,e:"h5",f:["Brisanje podataka sa skenera"]}," ",{p:[6,9,110],t:7,e:"hr"}," ",{p:[10,9,166],t:7,e:"div",f:[{p:[11,13,184],t:7,e:"button",m:[{n:"click",f:{x:{r:["@this"],s:"[_0.set(\"showDeleteDialog\",false)]"}},t:70}],f:["Ne"]}," ",{p:[12,13,263],t:7,e:"button",m:[{n:"primary",f:0,t:13},{n:"click",f:{x:{r:["@this"],s:"[_0.fire(\"clearscan\")]"}},t:70},{n:"style",f:"float: right",t:13}],f:["Da"]}]}]}]}],e:{"[_0.set(\"showDeleteDialog\",false)]":function (_0){return([_0.set("showDeleteDialog",false)]);},"[_0.fire(\"clearscan\")]":function (_0){return([_0.fire("clearscan")]);}}};
+component.exports.css = ".bg,.dialog{position:absolute}.bg{top:0;left:0;right:0;bottom:0;background-color:rgba(99,99,99,.5)}.dialog{top:50%;left:50%;background-color:#fff;transform:translate(-50%,-50%);width:31rem}";
+module.exports = Ractive.extend(component.exports);
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)(module)))
 
 /***/ })
 /******/ ]);

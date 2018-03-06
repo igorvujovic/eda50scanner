@@ -1,0 +1,48 @@
+<div class="bg">
+</div>
+<div class="dialog">
+    <card>
+        <h5>Brisanje podataka sa skenera</h5>
+        <hr>
+<!--
+        <p>Da li ste sigurni?</p>
+-->
+        <div>
+            <button on-click="@this.set('showDeleteDialog',false)">Ne</button>
+            <button primary on-click="@this.fire('clearscan')" style="float: right">Da</button>            
+        </div>
+    </card>
+</div>
+
+<style>
+    .bg {
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        background-color: rgba(99,99,99,0.5);
+        
+    }
+    .dialog {
+        position:absolute;
+        top:50%;
+        left:50%;
+        background-color: white;  
+        transform: translate(-50%, -50%);      
+        width: 31rem;
+    }
+</style>
+<script>
+    component.exports = {
+        onrender: function () {
+            var self = this;
+        },
+        data:function(){
+            return {
+                showDeleteDialog:false
+            }
+        }
+    }        
+
+</script>

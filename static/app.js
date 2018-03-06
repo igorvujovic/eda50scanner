@@ -38,6 +38,7 @@ ion.sound({
 });
 
 Ractive.components.Root                    =  require('./Root.html');
+Ractive.components.dialog                  =  require('./dialog.html');
 
 var ractive = new Ractive.components.Root({
     el: 'body',
@@ -51,9 +52,11 @@ var ractive = new Ractive.components.Root({
             , filename:''
             , cards:{} // : { '0800':{title:"0800", arr:[...]} }
             , keyz:[]
+            , showDeleteDialog:false
         }
     }
 });
+window.ractive = ractive;
 
 if (document.getElementById("scancode"))  document.getElementById("scancode").autofocus = true; 
 /*
@@ -84,7 +87,14 @@ socket.on('scan', function (scan) {
 
 socket.on('addscan', function (addscan) {
     console.log('addscan', addscan);
-    ractive.splice('scanhistoryfromserver', 0,0,addscan);
+    var scancode = addscan[3];
+    if (scancode && sifarnik[scancode]){
+        if (scanhistorykv[scancode]){
+            return
+        }
+        scanhistorykv[scancode] = true;
+        ractive.splice('scanhistoryfromserver', 0, 0, addscan);
+    }
 });
 
 socket.on('save2server', function () {
